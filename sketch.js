@@ -96,15 +96,17 @@ function drawString(str, x, y, charColor, targetGraphics) {
   let offsetX = 0;
   let offsetY = 0;
   for (char of str) {
-    if (char == "\n") {
+    const charPix = getFontChar(char);
+    if (
+      char == "\n" ||
+      x + offsetX + charPix[0].length >= targetGraphics.width
+    ) {
       offsetY += font.lineHeight;
       offsetX = 0;
       continue;
     }
-
     drawCharacter(char, x + offsetX, y + offsetY, charColor, targetGraphics);
-    const characterWidth = getFontChar(char)[0].length;
-    offsetX += characterWidth;
+    offsetX += charPix[0].length;
   }
 }
 

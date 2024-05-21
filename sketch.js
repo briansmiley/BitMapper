@@ -2,10 +2,14 @@ let writer;
 let clearButton;
 let copyButton;
 let canvas;
+let font;
 let inputs = {};
 let previewArea;
 const [initialW, initialH] = [4, 5];
 const CELL_SIZE = 50;
+function preload() {
+  font = loadJSON("./font.json");
+}
 function setup() {
   canvas = createCanvas(initialW * CELL_SIZE, initialH * CELL_SIZE);
   canvas.parent("canvas-box");
@@ -17,8 +21,8 @@ function setup() {
   inputs.w = document.getElementById("char-width-input");
   inputs.h = document.getElementById("char-height-input");
   inputs.chId = document.getElementById("char-id");
-  inputs.w.value = 5;
-  inputs.h.value = 5;
+  inputs.w.value = initialW;
+  inputs.h.value = initialH;
   inputs.w.addEventListener("change", () => {
     inputs.w.value = inputs.w.value || 1;
     writer.resize(inputs.w.value, writer.charHeight);
@@ -36,72 +40,6 @@ function draw() {
   writer.render();
   // drawString("1 2 3 1\n11AA 0 0 123", 10, 10, color("black"));
 }
-
-const font = {
-  lineHeight: 6,
-  chars: {
-    A: [
-      [0, 0, 1, 1, 0],
-      [0, 1, 0, 0, 1],
-      [0, 1, 1, 1, 1],
-      [0, 1, 0, 0, 1],
-      [0, 1, 0, 0, 1]
-    ],
-    " ": [
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    0: [
-      [0, 1, 1, 1],
-      [0, 1, 0, 1],
-      [0, 1, 0, 1],
-      [0, 1, 0, 1],
-      [0, 1, 1, 1]
-    ],
-
-    1: [
-      [0, 1, 1, 0],
-      [0, 0, 1, 0],
-      [0, 0, 1, 0],
-      [0, 0, 1, 0],
-      [0, 1, 1, 1]
-    ],
-
-    2: [
-      [0, 1, 1, 1],
-      [0, 0, 0, 1],
-      [0, 1, 1, 1],
-      [0, 1, 0, 0],
-      [0, 1, 1, 1]
-    ],
-
-    3: [
-      [0, 1, 1, 1],
-      [0, 0, 0, 1],
-      [0, 1, 1, 1],
-      [0, 0, 0, 1],
-      [0, 1, 1, 1]
-    ],
-
-    4: [
-      [0, 1, 0, 1],
-      [0, 1, 0, 1],
-      [0, 1, 1, 1],
-      [0, 0, 0, 1],
-      [0, 0, 0, 1]
-    ],
-    9: [
-      [0, 1, 1, 1],
-      [0, 1, 0, 1],
-      [0, 1, 1, 1],
-      [0, 0, 0, 1],
-      [0, 0, 0, 1]
-    ]
-  }
-};
 
 function drawCharacter(char, charX, charY, charColor) {
   if (!(char in font.chars)) {
@@ -139,7 +77,11 @@ function drawString(str, x, y, charColor) {
 }
 
 class CharacterWriter {
-  constructor(cellSize = CELL_SIZE, charHeight = 5, charWidth = 4) {
+  constructor(
+    cellSize = CELL_SIZE,
+    charHeight = initialH,
+    charWidth = initialW
+  ) {
     this.cellSize = cellSize;
     this.charHeight = charHeight;
     this.charWidth = charWidth;
@@ -181,16 +123,17 @@ class CharacterWriter {
     this.pixels[y][x] = value ? 1 : 0;
   }
   createArrayString() {
-    const str = `${inputs.chId.value || " "}: [${this.pixels
+    const preArrayString = `${
+      inputs.chId.value ? `"${inputs.chId.value}"` : " "
+    }: `;
+    const arrayString = `[${this.pixels
       .map((row) => `[${row.join(", ")}]`)
-      .join(
-        `,\n    ${" ".repeat(Math.max(inputs.chId.value.length - 1, 0))}`
-      )}],`;
-    return str;
+      .join(`,\n${" ".repeat(preArrayString.length + 1)}`)}],`;
+    return preArrayString.concat(arrayString);
   }
   copy() {
     const str = this.createArrayString();
-    window.navigator.clipboard.writeText(str);
+    window.navigator.clipboard.writeText(str + "\n");
     console.log(str);
   }
   clear() {

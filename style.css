@@ -3,6 +3,7 @@ body {
   margin: 0;
   padding: 10px;
   background: #eee;
+  font-family: arial;
 }
 
 canvas {
@@ -25,6 +26,9 @@ canvas {
 #master-container {
   display: flex;
   gap: 2em;
+}
+#font-preview {
+  margin-top: 10px;
 }
 input {
   width: 30px;

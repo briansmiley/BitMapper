@@ -17,7 +17,7 @@ function setup() {
   inputs.w = document.getElementById("char-width-input");
   inputs.h = document.getElementById("char-height-input");
   inputs.chId = document.getElementById("char-id");
-  inputs.w.value = 4;
+  inputs.w.value = 5;
   inputs.h.value = 5;
   inputs.w.addEventListener("change", () => {
     inputs.w.value = inputs.w.value || 1;

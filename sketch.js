@@ -9,6 +9,8 @@ let previewArea;
 let fontPreviewInput;
 const [initialW, initialH] = [4, 5];
 const CELL_SIZE = 50;
+const X_MARGIN = 4;
+const Y_MARGIN = 9;
 function preload() {
   font = loadJSON("./font.json");
 }
@@ -43,7 +45,7 @@ function setup() {
   });
   previewArea = document.getElementById("array-preview");
   fontPreviewInput = document.getElementById("font-preview-input");
-  fontPreviewInput.value = "ABCD";
+  fontPreviewInput.value = "ABCDEDFGHIJKLMNOPQRSTUVWXYZ\n1234567890";
 }
 
 function draw() {
@@ -51,24 +53,35 @@ function draw() {
   fontPreviewCanvas.background(255);
   writer.update();
   writer.render();
-  // drawString("1 2 3 1\n11AA 0 0 123", 10, 10, color("black"));
   const fontPreviewText = fontPreviewInput.value;
-  drawString(fontPreviewText, 5, 5, 0, fontPreviewCanvas);
+  const { _, offsetY } = drawString(
+    fontPreviewText,
+    X_MARGIN,
+    Y_MARGIN,
+    0,
+    fontPreviewCanvas
+  );
+  drawCharacter(
+    writer.pixels,
+    X_MARGIN,
+    Y_MARGIN + offsetY + 2 * font.lineHeight,
+    0,
+    fontPreviewCanvas
+  );
 }
 
-function drawCharacter(char, charX, charY, charColor, targetGraphics) {
+function drawCharacter(charPixels, charX, charY, charColor, targetGraphics) {
   targetGraphics.loadPixels();
-  const pixels = getFontChar(char);
   /* charX, charY should be bottom left corner of character
   so pixel position is charX + pixelX (normal)
   and charY - (charHeight - pixelY); i.e. start at bottom corner then move up
   */
-  for (let [pixelY, row] of pixels.entries()) {
+  for (let [pixelY, row] of charPixels.entries()) {
     for (let [pixelX, pixel] of row.entries()) {
       if (pixel)
         targetGraphics.set(
           charX + pixelX,
-          charY - (pixels.length - 1 - pixelY),
+          charY - (charPixels.length - 1 - pixelY),
           charColor
         );
     }
@@ -105,9 +118,10 @@ function drawString(str, x, y, charColor, targetGraphics) {
       offsetX = 0;
       continue;
     }
-    drawCharacter(char, x + offsetX, y + offsetY, charColor, targetGraphics);
+    drawCharacter(charPix, x + offsetX, y + offsetY, charColor, targetGraphics);
     offsetX += charPix[0].length;
   }
+  return { offsetX, offsetY };
 }
 
 class CharacterWriter {

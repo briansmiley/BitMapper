@@ -25,6 +25,7 @@ canvas {
 }
 #array-preview {
   width: 240px;
+  margin-top: 10px;
 }
 #master-container {
   display: flex;

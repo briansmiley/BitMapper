@@ -1,6 +1,6 @@
 let writer;
 let clearButton;
-let printButton;
+let copyButton;
 let canvas;
 let inputs = {};
 const [initialW, initialH] = [4, 5];
@@ -11,8 +11,8 @@ function setup() {
   writer = new CharacterWriter(CELL_SIZE);
   clearButton = document.getElementById("clear-writer-button");
   clearButton.onclick = () => writer.clear();
-  printButton = document.getElementById("print-writer-button");
-  printButton.onclick = () => writer.print();
+  copyButton = document.getElementById("copy-writer-button");
+  copyButton.onclick = () => writer.copy();
   inputs.w = document.getElementById("char-width-input");
   inputs.h = document.getElementById("char-height-input");
   inputs.w.value = 4;
@@ -170,10 +170,11 @@ class CharacterWriter {
   flipPixel(x, y) {
     this.pixels[y][x] = this.pixels[y][x] ? 0 : 1;
   }
-  print() {
+  copy() {
     const str = `_: [${this.pixels
       .map((row) => `[${row.join(", ")}]`)
       .join(",\n    ")}]`;
+    window.navigator.clipboard.writeText(str);
     console.log(str);
   }
   clear() {

@@ -23,6 +23,9 @@ canvas {
   display: flex;
   flex-direction: column;
 }
+#array-preview {
+  width: 240px;
+}
 #master-container {
   display: flex;
   gap: 2em;

@@ -14,21 +14,31 @@
   </head>
 
   <body>
-    <div id="canvas-box"></div>
-    <div id="inputs-container">
-      <span>
-        <label for="char-width-input">Width: </label
-        ><input id="char-width-input" type="number" min="1" step="1" />
-      </span>
-      <span>
-        <label for="char-height-input">Height:</label>
-        <input id="char-height-input" type="number" min="1" step="1" />
-      </span>
-    </div>
-    <label for="char-id">Character: </label><input id="char-id" type="text" />
-    <div class="buttons-container">
-      <button id="copy-writer-button">Copy</button>
-      <button id="clear-writer-button">Clear</button>
+    <div id="master-container">
+      <div id="left-container">
+        <div id="inputs-container">
+          <div id="width-height">
+            <span>
+              <label for="char-width-input">Width: </label
+              ><input id="char-width-input" type="number" min="1" step="1" />
+            </span>
+            <span>
+              <label for="char-height-input">Height:</label>
+              <input id="char-height-input" type="number" min="1" step="1" />
+            </span>
+          </div>
+          <span
+            ><label for="char-id">Character: </label
+            ><input id="char-id" type="text"
+          /></span>
+        </div>
+        <textarea id="array-preview" rows="5" readonly></textarea>
+        <div class="buttons-container">
+          <button id="copy-writer-button">Copy</button>
+          <button id="clear-writer-button">Clear</button>
+        </div>
+      </div>
+      <div id="canvas-box"></div>
     </div>
   </body>
 </html>

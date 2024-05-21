@@ -3,6 +3,7 @@ let clearButton;
 let copyButton;
 let canvas;
 let inputs = {};
+let previewArea;
 const [initialW, initialH] = [4, 5];
 const CELL_SIZE = 50;
 function setup() {
@@ -26,10 +27,12 @@ function setup() {
     inputs.h.value = inputs.h.value || 1;
     writer.resize(writer.charWidth, inputs.h.value);
   });
+  previewArea = document.getElementById("array-preview");
 }
 
 function draw() {
   background(220);
+  writer.update();
   writer.render();
   // drawString("1 2 3 1\n11AA 0 0 123", 10, 10, color("black"));
 }
@@ -177,10 +180,16 @@ class CharacterWriter {
   setPixel(x, y, value) {
     this.pixels[y][x] = value ? 1 : 0;
   }
-  copy() {
-    const str = `${inputs.chId.value}: [${this.pixels
+  createArrayString() {
+    const str = `${inputs.chId.value || " "}: [${this.pixels
       .map((row) => `[${row.join(", ")}]`)
-      .join(",\n    ")}],`;
+      .join(
+        `,\n    ${" ".repeat(Math.max(inputs.chId.value.length - 1, 0))}`
+      )}],`;
+    return str;
+  }
+  copy() {
+    const str = this.createArrayString();
     window.navigator.clipboard.writeText(str);
     console.log(str);
   }
@@ -206,8 +215,8 @@ class CharacterWriter {
     else return { x, y };
   }
   getMouseXY() {
-    const x = parseInt(mouseX / this.cellSize);
-    const y = parseInt(mouseY / this.cellSize);
+    const x = Math.floor(mouseX / this.cellSize);
+    const y = Math.floor(mouseY / this.cellSize);
     return { x, y };
   }
   handleDragging() {
@@ -215,8 +224,12 @@ class CharacterWriter {
     if (!pos) return;
     if (this.dragging) this.setPixel(pos.x, pos.y, this.dragSetVal);
   }
-  render() {
+  update() {
     this.handleDragging();
+    previewArea.value = this.createArrayString();
+    previewArea.rows = this.pixels.length;
+  }
+  render() {
     push();
     const { x: mX, y: mY } = this.getMouseXY();
     clear();

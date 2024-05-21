@@ -1,10 +1,12 @@
 let writer;
 let clearButton;
 let copyButton;
-let canvas;
+let canvas, fontPreviewCanvas;
 let font;
 let inputs = {};
+let charErrorLogged = {};
 let previewArea;
+let fontPreviewInput;
 const [initialW, initialH] = [4, 5];
 const CELL_SIZE = 50;
 function preload() {
@@ -13,7 +15,15 @@ function preload() {
 function setup() {
   canvas = createCanvas(initialW * CELL_SIZE, initialH * CELL_SIZE);
   canvas.parent("canvas-box");
+  fontPreviewCanvas = createGraphics(
+    200,
+    100,
+    document.getElementById("font-preview-canvas")
+  );
+  fontPreviewCanvas.style("display", "block");
   writer = new CharacterWriter(CELL_SIZE);
+
+  //HTML Interface stuff
   clearButton = document.getElementById("clear-writer-button");
   clearButton.onclick = () => writer.clear();
   copyButton = document.getElementById("copy-writer-button");
@@ -32,21 +42,23 @@ function setup() {
     writer.resize(writer.charWidth, inputs.h.value);
   });
   previewArea = document.getElementById("array-preview");
+  fontPreviewInput = document.getElementById("font-preview-input");
+  fontPreviewInput.value = "ABCD";
 }
 
 function draw() {
   background(220);
+  fontPreviewCanvas.background(255);
   writer.update();
   writer.render();
   // drawString("1 2 3 1\n11AA 0 0 123", 10, 10, color("black"));
+  const fontPreviewText = fontPreviewInput.value;
+  drawString(fontPreviewText, 5, 5, 0, fontPreviewCanvas);
 }
 
-function drawCharacter(char, charX, charY, charColor) {
-  if (!(char in font.chars)) {
-    throw new Error(`Character '${char}' is not defined in the font.`);
-  }
-  loadPixels();
-  const pixels = font.chars[char];
+function drawCharacter(char, charX, charY, charColor, targetGraphics) {
+  targetGraphics.loadPixels();
+  const pixels = getFontChar(char);
   /* charX, charY should be bottom left corner of character
   so pixel position is charX + pixelX (normal)
   and charY - (charHeight - pixelY); i.e. start at bottom corner then move up
@@ -54,13 +66,33 @@ function drawCharacter(char, charX, charY, charColor) {
   for (let [pixelY, row] of pixels.entries()) {
     for (let [pixelX, pixel] of row.entries()) {
       if (pixel)
-        set(charX + pixelX, charY - (pixels.length - 1 - pixelY), charColor);
+        targetGraphics.set(
+          charX + pixelX,
+          charY - (pixels.length - 1 - pixelY),
+          charColor
+        );
     }
   }
-  updatePixels();
+  targetGraphics.updatePixels();
 }
-
-function drawString(str, x, y, charColor) {
+function getFontChar(char) {
+  let ret;
+  try {
+    ret = font.chars[char];
+    if (!ret) {
+      ret = font.chars["█"];
+      if (!charErrorLogged[char]) {
+        charErrorLogged[char] = true;
+        throw new Error(`${char} is not in the font`);
+      }
+    }
+  } catch (e) {
+    console.error(e.message);
+  } finally {
+    return ret;
+  }
+}
+function drawString(str, x, y, charColor, targetGraphics) {
   let offsetX = 0;
   let offsetY = 0;
   for (char of str) {
@@ -70,8 +102,8 @@ function drawString(str, x, y, charColor) {
       continue;
     }
 
-    const characterWidth = font.chars[char][0].length;
-    drawCharacter(char, x + offsetX, y + offsetY, charColor);
+    drawCharacter(char, x + offsetX, y + offsetY, charColor, targetGraphics);
+    const characterWidth = getFontChar(char)[0].length;
     offsetX += characterWidth;
   }
 }

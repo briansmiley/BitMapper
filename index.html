@@ -16,8 +16,14 @@
   <body>
     <div id="canvas-box"></div>
     <div id="inputs-container">
-      Width: <input id="char-width-input" /> Height:
-      <input id="char-height-input" />
+      <span>
+        <label for="char-width-input">Width: </label
+        ><input id="char-width-input" type="number" min="1" step="1" />
+      </span>
+      <span>
+        <label for="char-height-input">Height:</label>
+        <input id="char-height-input" type="number" min="1" step="1" />
+      </span>
     </div>
     <div class="buttons-container">
       <button id="copy-writer-button">Copy</button>

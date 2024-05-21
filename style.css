@@ -13,8 +13,10 @@ canvas {
 }
 #inputs-container {
   display: flex;
-  margin-bottom: 10px;
+  gap: 1em;
+  margin-top: 10px;
+  margin-bottom: 5px;
 }
 input {
-  width: 50px;
+  width: 30px;
 }

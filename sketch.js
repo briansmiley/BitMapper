@@ -17,12 +17,14 @@ function setup() {
   inputs.h = document.getElementById("char-height-input");
   inputs.w.value = 4;
   inputs.h.value = 5;
-  inputs.w.addEventListener("change", () =>
-    writer.resize(inputs.w.value, writer.charHeight)
-  );
-  inputs.h.addEventListener("change", () =>
-    writer.resize(writer.charWidth, inputs.h.value)
-  );
+  inputs.w.addEventListener("change", () => {
+    inputs.w.value = inputs.w.value || 1;
+    writer.resize(inputs.w.value, writer.charHeight);
+  });
+  inputs.h.addEventListener("change", () => {
+    inputs.h.value = inputs.h.value || 1;
+    writer.resize(writer.charWidth, inputs.h.value);
+  });
 }
 
 function draw() {
@@ -139,6 +141,8 @@ class CharacterWriter {
     this.charHeight = charHeight;
     this.charWidth = charWidth;
     this.pixels = this.newPixelArray(0);
+    this.dragging = false;
+    this.dragSetVal = 1;
   }
   resize(newWidth, newHeight) {
     const w = Number(newWidth);
@@ -170,6 +174,9 @@ class CharacterWriter {
   flipPixel(x, y) {
     this.pixels[y][x] = this.pixels[y][x] ? 0 : 1;
   }
+  setPixel(x, y, value) {
+    this.pixels[y][x] = value ? 1 : 0;
+  }
   copy() {
     const str = `_: [${this.pixels
       .map((row) => `[${row.join(", ")}]`)
@@ -180,18 +187,36 @@ class CharacterWriter {
   clear() {
     this.pixels = this.newPixelArray(0);
   }
-  handleClick() {
-    let [x, y] = [this.getMouseXY().x, this.getMouseXY().y];
+  handleClickRelease() {
+    this.dragging = false;
+  }
+  handleClickStart() {
+    const mouseXY = this.mousePositionOnThis();
+    if (!mouseXY) return;
+    this.startDrag(mouseXY);
+  }
+  startDrag({ x, y }) {
+    this.dragging = true;
+    this.dragSetVal = this.pixels[y][x] ? 0 : 1; //whether we are turning on/off pixels depends on starting square value
+  }
+  mousePositionOnThis() {
+    let { x, y } = this.getMouseXY();
     if (x < 0 || x >= this.pixels[0].length || y < 0 || y >= this.pixels.length)
-      return;
-    this.flipPixel(x, y);
+      return false;
+    else return { x, y };
   }
   getMouseXY() {
     const x = parseInt(mouseX / this.cellSize);
     const y = parseInt(mouseY / this.cellSize);
     return { x, y };
   }
+  handleDragging() {
+    const pos = this.mousePositionOnThis();
+    if (!pos) return;
+    if (this.dragging) this.setPixel(pos.x, pos.y, this.dragSetVal);
+  }
   render() {
+    this.handleDragging();
     push();
     const { x: mX, y: mY } = this.getMouseXY();
     clear();
@@ -211,6 +236,10 @@ class CharacterWriter {
     pop();
   }
 }
+function mousePressed() {
+  writer.handleClickStart();
+}
+
 function mouseClicked() {
-  writer.handleClick();
+  writer.handleClickRelease();
 }

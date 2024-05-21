@@ -53,7 +53,7 @@ function draw() {
   fontPreviewCanvas.background(255);
   writer.update();
   writer.render();
-  const fontPreviewText = fontPreviewInput.value;
+  const fontPreviewText = fontPreviewInput.value.toUpperCase();
   const { _, offsetY } = drawString(
     fontPreviewText,
     X_MARGIN,

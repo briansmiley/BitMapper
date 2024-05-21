@@ -15,6 +15,7 @@ function setup() {
   copyButton.onclick = () => writer.copy();
   inputs.w = document.getElementById("char-width-input");
   inputs.h = document.getElementById("char-height-input");
+  inputs.chId = document.getElementById("char-id");
   inputs.w.value = 4;
   inputs.h.value = 5;
   inputs.w.addEventListener("change", () => {
@@ -43,7 +44,6 @@ const font = {
       [0, 1, 0, 0, 1],
       [0, 1, 0, 0, 1]
     ],
-
     " ": [
       [0, 0, 0, 0],
       [0, 0, 0, 0],
@@ -178,9 +178,9 @@ class CharacterWriter {
     this.pixels[y][x] = value ? 1 : 0;
   }
   copy() {
-    const str = `_: [${this.pixels
+    const str = `${inputs.chId.value}: [${this.pixels
       .map((row) => `[${row.join(", ")}]`)
-      .join(",\n    ")}]`;
+      .join(",\n    ")}],`;
     window.navigator.clipboard.writeText(str);
     console.log(str);
   }

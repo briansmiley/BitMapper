@@ -20,7 +20,7 @@ function drawString(
   x,
   y,
   charColor,
-  targetGraphics = canvas,
+  targetGraphics = window.canvas,
   toUpper = true
 ) {
   let offsetX = 0;

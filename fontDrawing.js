@@ -39,6 +39,7 @@ function drawString(
     drawCharacter(charPix, x + offsetX, y + offsetY, charColor, targetGraphics);
     offsetX += charPix[0].length;
   }
+  offsetY += font.lineHeight; //so we return offsetY that will put next line on a new line
   return { offsetX, offsetY };
 }
 

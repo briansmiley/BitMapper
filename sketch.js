@@ -45,7 +45,7 @@ function setup() {
   previewArea = document.getElementById("array-preview");
   fontPreviewInput = document.getElementById("font-preview-input");
   fontPreviewInput.value =
-    "ABCDEDFGHIJKLMNOPQRSTUVWXYZ\n1234567890\n`~!@#$%^&*())-+=_[]{}/\\|,.<>?";
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ\n1234567890\n`~!@#$%^&*())-+=_[]{}/\\|,.<>?";
 }
 
 function draw() {

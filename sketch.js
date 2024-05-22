@@ -4,7 +4,6 @@ let copyButton;
 let canvas, fontPreviewCanvas;
 let font;
 let inputs = {};
-let charErrorLogged = {};
 let previewArea;
 let fontPreviewInput;
 const [initialW, initialH] = [4, 5];
@@ -77,60 +76,6 @@ function draw() {
   );
   //render magnifying glass effect on preview canvas
   magnifyPreview();
-}
-
-function drawCharacter(charPixels, charX, charY, charColor, targetGraphics) {
-  targetGraphics.loadPixels();
-  /* charX, charY should be bottom left corner of character
-  so pixel position is charX + pixelX (normal)
-  and charY - (charHeight - pixelY); i.e. start at bottom corner then move up
-  */
-  for (let [pixelY, row] of charPixels.entries()) {
-    for (let [pixelX, pixel] of row.entries()) {
-      if (pixel)
-        targetGraphics.set(
-          charX + pixelX,
-          charY - (charPixels.length - 1 - pixelY),
-          charColor
-        );
-    }
-  }
-  targetGraphics.updatePixels();
-}
-function getFontChar(char) {
-  let ret;
-  try {
-    ret = font.chars[char];
-    if (!ret) {
-      ret = font.chars["█"];
-      if (!charErrorLogged[char]) {
-        charErrorLogged[char] = true;
-        throw new Error(`${char} is not in the font`);
-      }
-    }
-  } catch (e) {
-    console.error(e.message);
-  } finally {
-    return ret;
-  }
-}
-function drawString(str, x, y, charColor, targetGraphics) {
-  let offsetX = 0;
-  let offsetY = 0;
-  for (char of str) {
-    const charPix = getFontChar(char);
-    if (
-      char == "\n" ||
-      x + offsetX + charPix[0].length >= targetGraphics.width
-    ) {
-      offsetY += font.lineHeight;
-      offsetX = 0;
-      if (char == "\n") continue;
-    }
-    drawCharacter(charPix, x + offsetX, y + offsetY, charColor, targetGraphics);
-    offsetX += charPix[0].length;
-  }
-  return { offsetX, offsetY };
 }
 
 class CharacterWriter {

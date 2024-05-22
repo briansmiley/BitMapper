@@ -1,9 +1,54 @@
+let charErrorLogged = {};
+/*
+  drawString takes 6 arguments: 
+  1. the string to be printed
+  2.&3. x,y coodinates of the **bottom left corner** of the first character
+  4. letter color
+  5. (optional?) the target graphics element,should default to a main canvas?
+  6. (optional, default true) whether to Uppercase all chars in string
+      (this is set to true because I didnt add lowercase letters yet)
+   
+   It returns {offsetX, offsetY} which can be used to access the location
+   of the last written character
+
+   It should automatically wrap when it hits the edge of the canvas and supports newline characters
+
+   Recommend using drawString even for single characters
+*/
+function drawString(
+  inStr,
+  x,
+  y,
+  charColor,
+  targetGraphics = canvas,
+  toUpper = true
+) {
+  let offsetX = 0;
+  let offsetY = 0;
+  if (toUpper) str = inStr.toUpperCase();
+  for (char of str) {
+    const charPix = getFontChar(char);
+    if (
+      char == "\n" ||
+      x + offsetX + charPix[0].length >= targetGraphics.width
+    ) {
+      offsetY += font.lineHeight;
+      offsetX = 0;
+      if (char == "\n") continue;
+    }
+    drawCharacter(charPix, x + offsetX, y + offsetY, charColor, targetGraphics);
+    offsetX += charPix[0].length;
+  }
+  return { offsetX, offsetY };
+}
+
 function drawCharacter(charPixels, charX, charY, charColor, targetGraphics) {
   targetGraphics.loadPixels();
-  /* charX, charY should be bottom left corner of character
+  /*
+    charX, charY should be bottom left corner of character
     so pixel position is charX + pixelX (normal)
     and charY - (charHeight - pixelY); i.e. start at bottom corner then move up
-    */
+  */
   for (let [pixelY, row] of charPixels.entries()) {
     for (let [pixelX, pixel] of row.entries()) {
       if (pixel)
@@ -32,24 +77,6 @@ function getFontChar(char) {
   } finally {
     return ret;
   }
-}
-function drawString(str, x, y, charColor, targetGraphics) {
-  let offsetX = 0;
-  let offsetY = 0;
-  for (char of str) {
-    const charPix = getFontChar(char);
-    if (
-      char == "\n" ||
-      x + offsetX + charPix[0].length >= targetGraphics.width
-    ) {
-      offsetY += font.lineHeight;
-      offsetX = 0;
-      if (char == "\n") continue;
-    }
-    drawCharacter(charPix, x + offsetX, y + offsetY, charColor, targetGraphics);
-    offsetX += charPix[0].length;
-  }
-  return { offsetX, offsetY };
 }
 
 /*

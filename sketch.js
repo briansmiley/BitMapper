@@ -15,8 +15,8 @@ function preload() {
   font = loadJSON("./font.json");
 }
 function setup() {
-  canvas = createCanvas(initialW * CELL_SIZE, initialH * CELL_SIZE);
-  canvas.parent("canvas-box");
+  gridCanvas = createCanvas(initialW * CELL_SIZE, initialH * CELL_SIZE);
+  gridCanvas.parent("canvas-box");
   fontPreviewCanvas = createGraphics(
     200,
     100,
@@ -54,7 +54,11 @@ function draw() {
   fontPreviewCanvas.background(255);
   writer.update();
   writer.render();
+
+  //fetch the text from the preview input
   const fontPreviewText = fontPreviewInput.value.toUpperCase();
+
+  //write the Test text in pixel font and save the ending offset valus
   const { _, offsetY } = drawString(
     fontPreviewText,
     X_MARGIN,
@@ -62,6 +66,8 @@ function draw() {
     0,
     fontPreviewCanvas
   );
+
+  //draw the currently-constructed character below the preview text
   drawCharacter(
     writer.pixels,
     X_MARGIN,
@@ -69,6 +75,8 @@ function draw() {
     0,
     fontPreviewCanvas
   );
+  //render magnifying glass effect on preview canvas
+  magnifyPreview();
 }
 
 function drawCharacter(charPixels, charX, charY, charColor, targetGraphics) {
@@ -117,7 +125,7 @@ function drawString(str, x, y, charColor, targetGraphics) {
     ) {
       offsetY += font.lineHeight;
       offsetX = 0;
-      continue;
+      if (char == "\n") continue;
     }
     drawCharacter(charPix, x + offsetX, y + offsetY, charColor, targetGraphics);
     offsetX += charPix[0].length;
@@ -247,4 +255,39 @@ function mousePressed() {
 
 function mouseClicked() {
   writer.handleClickRelease();
+}
+
+let fontPreviewMouseXY = () => {
+  let gridCanvasRect = gridCanvas.elt.getBoundingClientRect();
+  let fontPreviewCanvasRect = fontPreviewCanvas.elt.getBoundingClientRect();
+  let xOffset = fontPreviewCanvasRect.x - gridCanvasRect.x;
+  let yOffset = fontPreviewCanvasRect.y - gridCanvasRect.y;
+  return { x: mouseX - xOffset, y: mouseY - yOffset };
+};
+
+function magnifyPreview() {
+  const mousePos = fontPreviewMouseXY();
+  //do nothing if mouse isnt hovering the preview canvas
+  if (
+    mousePos.x < 0 ||
+    mousePos.x > fontPreviewCanvas.width ||
+    mousePos.y < 0 ||
+    mousePos.y > fontPreviewCanvas.height
+  )
+    return;
+  //buffer the canvas
+  const buffer = fontPreviewCanvas.get();
+  const magnifierSize = 50;
+  const magnifierScale = 5;
+  fontPreviewCanvas.image(
+    buffer, //source image
+    mousePos.x - magnifierSize / 2, //destination for image
+    mousePos.y - magnifierSize / 2,
+    magnifierSize, //size of imaged image
+    magnifierSize,
+    mousePos.x - magnifierSize / (magnifierScale * 2), //top left corner of source region in image source
+    mousePos.y - magnifierSize / (magnifierScale * 2),
+    magnifierSize / magnifierScale, // dimensions of source subsection to image
+    magnifierSize / magnifierScale
+  );
 }

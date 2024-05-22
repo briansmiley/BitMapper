@@ -34,6 +34,9 @@ canvas {
 #font-preview {
   margin-top: 10px;
 }
+:hover #font-preview {
+  cursor: crosshair;
+}
 input {
   width: 30px;
 }

@@ -226,12 +226,12 @@ function magnifyPreview() {
   const magnifierScale = 5;
   fontPreviewCanvas.image(
     buffer, //source image
-    mousePos.x - magnifierSize / 2, //destination for image
-    mousePos.y - magnifierSize / 2,
+    mousePos.x, //destination for image
+    mousePos.y,
     magnifierSize, //size of imaged image
     magnifierSize,
-    mousePos.x - magnifierSize / (magnifierScale * 2), //top left corner of source region in image source
-    mousePos.y - magnifierSize / (magnifierScale * 2),
+    max(mousePos.x - magnifierSize / (magnifierScale * 2), 0), //top left corner of source region in image source
+    max(mousePos.y - magnifierSize / (magnifierScale * 2), 0),
     magnifierSize / magnifierScale, // dimensions of source subsection to image
     magnifierSize / magnifierScale
   );

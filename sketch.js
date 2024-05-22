@@ -104,7 +104,7 @@ class CharacterWriter {
     if (heightDiff > 0)
       this.pixels = this.pixels.concat(Array(heightDiff).fill([...dummyRow]));
     this.pixels = this.pixels.slice(0, h).map((row) => row.slice(0, w));
-    canvas.resize(
+    gridCanvas.resize(
       this.charWidth * this.cellSize,
       this.charHeight * this.cellSize
     );
